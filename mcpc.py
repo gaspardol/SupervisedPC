@@ -114,8 +114,7 @@ train_loader, val_loader, test_loader = get_mnist_data(config)
 # create model
 gen_pc = get_model(config, use_cuda, sample_x_fn=sample_x_fn_normal)
 
-# create trainer for MAP inference
-# create trainer
+# create trainer for warm-up MAP inference
 pc_trainer = get_pc_trainer(gen_pc, config, is_mcpc=True)
 # create MCPC trainer
 mcpc_trainer = get_mcpc_trainer(gen_pc, config, training=True)
