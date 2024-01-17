@@ -26,7 +26,7 @@ if use_cuda:
     print("Using GPU")
 
 def launch_sweep(sweep_config):
-    return wandb.sweep(sweep_config, project="mcpc")
+    return wandb.sweep(sweep_config, project=sweep_config["project"])
     
 
 
@@ -139,9 +139,9 @@ def train_model(sweep_config=None):
                 
 
 sweep_config={
-    'method': 'bayes', 
-    'name': 'mcpc_supervised',
-    'project': 'mcpc',
+    'method': 'random', 
+    'name': 'cov_random',
+    'project': 'mcpc_supervised',
     'metric': {
         'goal': 'maximize', 
         'name': 'acc'
@@ -163,8 +163,8 @@ sweep_config={
 
 wandb.login()
 
-sweep_id = None
-sweep_id = 'mcpc/b93ftnkq' 
+# sweep_id = None
+sweep_id = sweep_config['project'] + '/9gy1hg83' 
 if sweep_id == None:
     sweep_id = launch_sweep(sweep_config)
 

@@ -1,0 +1,17 @@
+2024-01-17 17:15:22,726 INFO    Thread-9 (_run_job):19120 [wandb_setup.py:_flush():68] Configure stats pid to 19120
+2024-01-17 17:15:22,726 INFO    Thread-9 (_run_job):19120 [wandb_setup.py:_flush():68] Loading settings from C:\Users\olivi\.config\wandb\settings
+2024-01-17 17:15:22,726 INFO    Thread-9 (_run_job):19120 [wandb_setup.py:_flush():68] Loading settings from C:\Users\olivi\OneDrive - Nexus365\Projects\SupervisedPC\SupervisedPC\wandb\settings
+2024-01-17 17:15:22,726 INFO    Thread-9 (_run_job):19120 [wandb_setup.py:_flush():68] Loading settings from environment variables: {'_require_service': 'True', 'project': 'mcpc_supervised', 'entity': 'supervisepc', 'root_dir': 'C:\\Users\\olivi\\OneDrive - Nexus365\\Projects\\SupervisedPC\\SupervisedPC', 'sweep_id': '9gy1hg83', 'run_id': 'fky77ngh', 'sweep_param_path': 'C:\\Users\\olivi\\OneDrive - Nexus365\\Projects\\SupervisedPC\\SupervisedPC\\wandb\\sweep-9gy1hg83\\config-fky77ngh.yaml'}
+2024-01-17 17:15:22,729 INFO    Thread-9 (_run_job):19120 [wandb_setup.py:_flush():68] Inferring run settings from compute environment: {'program_relpath': 'mcpc_sweep.py', 'program': 'c:\\Users\\olivi\\OneDrive - Nexus365\\Projects\\SupervisedPC\\SupervisedPC\\mcpc_sweep.py'}
+2024-01-17 17:15:22,729 INFO    Thread-9 (_run_job):19120 [wandb_init.py:_log_setup():478] Logging user logs to C:\Users\olivi\OneDrive - Nexus365\Projects\SupervisedPC\SupervisedPC\wandb\run-20240117_171522-fky77ngh\logs\debug.log
+2024-01-17 17:15:22,729 INFO    Thread-9 (_run_job):19120 [wandb_init.py:_log_setup():479] Logging internal logs to C:\Users\olivi\OneDrive - Nexus365\Projects\SupervisedPC\SupervisedPC\wandb\run-20240117_171522-fky77ngh\logs\debug-internal.log
+2024-01-17 17:15:22,729 INFO    Thread-9 (_run_job):19120 [wandb_init.py:init():518] calling init triggers
+2024-01-17 17:15:22,729 INFO    Thread-9 (_run_job):19120 [wandb_init.py:init():521] wandb.init called with sweep_config: {'activation_fn': 'relu', 'adam_b0': 0.9, 'batch_size': 2048, 'decay': 0.01, 'hidden_size': 360, 'loss_fn': 'bernoulli_fn', 'lr_p': 0.1, 'lr_x': 0.3, 'lr_x_mcpc': 0.1, 'sampling': 1}
+config: {}
+2024-01-17 17:15:22,729 INFO    Thread-9 (_run_job):19120 [wandb_init.py:init():571] starting backend
+2024-01-17 17:15:22,729 INFO    Thread-9 (_run_job):19120 [wandb_init.py:init():575] setting up manager
+2024-01-17 17:15:22,741 INFO    Thread-9 (_run_job):19120 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=spawn, using: spawn
+2024-01-17 17:15:22,751 INFO    Thread-9 (_run_job):19120 [wandb_init.py:init():582] backend started and connected
+2024-01-17 17:15:22,756 INFO    Thread-9 (_run_job):19120 [wandb_run.py:_config_callback():1249] config_cb None None {'activation_fn': 'relu', 'adam_b0': 0.9, 'batch_size': 2048, 'decay': 0.01, 'hidden_size': 360, 'loss_fn': 'bernoulli_fn', 'lr_p': 0.1, 'lr_x': 0.3, 'lr_x_mcpc': 0.1, 'sampling': 1}
+2024-01-17 17:15:22,757 INFO    Thread-9 (_run_job):19120 [wandb_init.py:init():670] updated telemetry
+2024-01-17 17:15:22,800 INFO    Thread-9 (_run_job):19120 [wandb_init.py:init():710] communicating run to backend with 60.0 second timeout

@@ -1,0 +1,22 @@
+wandb_version: 1
+
+activation_fn:
+  value: relu
+adam_b0:
+  value: 0.9
+batch_size:
+  value: 2048
+decay:
+  value: 0.01
+hidden_size:
+  value: 360
+loss_fn:
+  value: bernoulli_fn
+lr_p:
+  value: 0.1
+lr_x:
+  value: 0.3
+lr_x_mcpc:
+  value: 0.1
+sampling:
+  value: 1
