@@ -1,0 +1,53 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.13.9
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.10.9
+    start_time: 1705511106.106361
+    t:
+      1:
+      - 1
+      - 41
+      - 55
+      3:
+      - 23
+      4: 3.10.9
+      5: 0.13.9
+      8:
+      - 3
+      - 5
+activation_fn:
+  desc: null
+  value: tanh
+adam_b0:
+  desc: null
+  value: 0.9
+batch_size:
+  desc: null
+  value: 128
+decay:
+  desc: null
+  value: 0.01
+hidden_size:
+  desc: null
+  value: 360
+loss_fn:
+  desc: null
+  value: bernoulli_fn
+lr_p:
+  desc: null
+  value: 0.01
+lr_x:
+  desc: null
+  value: 0.7
+lr_x_mcpc:
+  desc: null
+  value: 0.003
+sampling:
+  desc: null
+  value: 100

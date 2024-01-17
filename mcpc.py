@@ -84,7 +84,7 @@ def test_multihead(model, testloader, config, use_cuda, pc_trainer):
     # reset each layer to not take element wise energies
     for l in layers:
         l.is_keep_energy_per_datapoint = True
-    return correct_count / all_count
+    return (correct_count / all_count).cpu().item()
 
 
 use_cuda = torch.cuda.is_available()
@@ -125,11 +125,16 @@ train_loader, val_loader, test_loader = get_mnist_data(config)
 # create model
 gen_pc = get_model(config, use_cuda, sample_x_fn=sample_x_fn_normal)
 
+model_path = "mcpc_supervised_55"
+gen_pc.load_state_dict(torch.load(model_path, map_location='cuda:0'),strict=False)
+gen_pc.train()
+
 # create trainer for warm-up MAP inference
 pc_trainer = get_pc_trainer(gen_pc, config, is_mcpc=True)
 # create MCPC trainer
 mcpc_trainer = get_mcpc_trainer(gen_pc, config, training=True)
 
+best_acc = 0
 for idx_epoch in range(config["EPOCHS"]):
     for data, labels in train_loader:
         # convert to onehot
@@ -146,6 +151,8 @@ for idx_epoch in range(config["EPOCHS"]):
     # acc = test(gen_pc, val_loader, config, use_cuda)
     # print("Classificaiton accuracy: ", acc)
     acc = test(gen_pc, val_loader, config, use_cuda, bias=0.)
-    print("Classificaiton accuracy, 00: ", acc)
-
-torch.save(gen_pc.state_dict(), +config["model_name"])
+    print("Classificaiton accuracy, 0: ", acc)
+    if acc> best_acc:
+        print("saving model")
+        torch.save(gen_pc.state_dict(), config["model_name"]+"_"+str(int(round(acc.item(),2)*100)))  
+        best_acc = acc

@@ -1,0 +1,22 @@
+wandb_version: 1
+
+activation_fn:
+  value: tanh
+adam_b0:
+  value: 0.9
+batch_size:
+  value: 128
+decay:
+  value: 0.01
+hidden_size:
+  value: 360
+loss_fn:
+  value: bernoulli_fn
+lr_p:
+  value: 0.01
+lr_x:
+  value: 0.7
+lr_x_mcpc:
+  value: 0.003
+sampling:
+  value: 100

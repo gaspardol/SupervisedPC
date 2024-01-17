@@ -19,6 +19,9 @@ def sample_x_fn(inputs):
 def sample_x_fn_normal(inputs):
     return torch.randn_like(inputs['mu'])
 
+def sample_x_fn_one_hot_mean(inputs):
+    return torch.ones_like(inputs['mu'])/inputs['mu'].shape[-1]
+
 def sample_x_fn_cte(inputs):
     return 3*torch.ones_like(inputs['mu'])
 

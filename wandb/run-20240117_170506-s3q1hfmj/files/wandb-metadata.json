@@ -1,0 +1,50 @@
+{
+    "os": "Windows-10-10.0.22621-SP0",
+    "python": "3.10.9",
+    "heartbeatAt": "2024-01-17T17:05:06.777634",
+    "startedAt": "2024-01-17T17:05:06.081657",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "c:\\Users\\olivi\\OneDrive - Nexus365\\Projects\\SupervisedPC\\SupervisedPC\\mcpc_sweep.py",
+    "codePath": "mcpc_sweep.py",
+    "git": {
+        "remote": "https://github.com/gaspardol/SupervisedPC.git",
+        "commit": "04b18643f956b7a619eb17c51bdce99ec1ffc322"
+    },
+    "email": "oliviers.gaspard@gmail.com",
+    "root": "C:/Users/olivi/OneDrive - Nexus365/Projects/SupervisedPC/SupervisedPC",
+    "host": "gaspard_oxford",
+    "username": "olivi",
+    "executable": "C:\\Users\\olivi\\miniconda3\\envs\\pytorch\\python.exe",
+    "cpu_count": 14,
+    "cpu_count_logical": 20,
+    "cpu_freq": {
+        "current": 2300.0,
+        "min": 0.0,
+        "max": 2300.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2300.0,
+            "min": 0.0,
+            "max": 2300.0
+        }
+    ],
+    "disk": {
+        "total": 931.4667930603027,
+        "used": 745.3500747680664
+    },
+    "gpu": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+            "memory_total": 4294967296
+        }
+    ],
+    "memory": {
+        "total": 63.67876434326172
+    }
+}
