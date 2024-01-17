@@ -2,19 +2,18 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
-from utils import Bias, Bias_supervised, bernoulli_fn, get_marginal_likelihood, get_mcpc_trainer_optimised, sample_pc, sample_x_fn_normal, setup_fig, get_mnist_data, get_model, get_pc_trainer, get_mcpc_trainer, fe_fn, random_step
-from utils import get_mse_rec, get_fid, get_acc
-
+from utils import Bias, Bias_supervised, bernoulli_fn, sample_x_fn_normal, setup_fig, get_mnist_data, get_model, get_pc_trainer, get_mcpc_trainer, random_step
+from copy import deepcopy
 import predictive_coding as pc
 
 
 torch.manual_seed(0)
 
 
-def test(model, testloader, config, use_cuda):
+def test(model, testloader, config, use_cuda, bias = 0.1):
     # add bias layer for inferece
     test_model = nn.Sequential(
-        Bias_supervised(10, offset=0.1),
+        Bias_supervised(10, offset=bias),
         pc.PCLayer(sample_x_fn=sample_x_fn_normal),
         model
     )
@@ -22,8 +21,12 @@ def test(model, testloader, config, use_cuda):
     if use_cuda:
         test_model.cuda()
 
+    test_config = deepcopy(config)
+    test_config["T_pc"] = 500
+    test_config["optimizer_x_kwargs_pc"]={"lr": 0.1}
+
     # make pc_trainer for test_model
-    pc_trainer = get_pc_trainer(test_model, config, is_mcpc=True, training=False)
+    pc_trainer = get_pc_trainer(test_model, test_config, is_mcpc=True, training=False)
 
     correct_count, all_count = 0., 0.
     for data, labels in tqdm(testloader):
@@ -45,6 +48,14 @@ def test_multihead(model, testloader, config, use_cuda, pc_trainer):
         This function finds the one-hot output with the lowest energy of each test data and compares it to the true label
         This should behave like a one-hot prior 
     """
+
+    test_config = deepcopy(config)
+    test_config["T_pc"] = 2000
+    test_config["optimizer_x_kwargs_pc"]={"lr": 0.05}
+
+    # make pc_trainer for test_model
+    pc_trainer = get_pc_trainer(model, test_config, is_mcpc=True, training=False)
+
 
     correct_count, all_count = 0., 0.
     # set model pc layer to keep track of element wise energy
@@ -130,7 +141,11 @@ for idx_epoch in range(config["EPOCHS"]):
         # mc inference
         mc_results = mcpc_trainer.train_on_batch(inputs=labels,loss_fn=config["loss_fn"],loss_fn_kwargs={'_target': data,'_var':config["input_var"]}, callback_after_t=random_step, callback_after_t_kwargs={'_pc_trainer':mcpc_trainer},is_sample_x_at_batch_start=False,is_log_progress=False,is_return_results_every_t=False,is_checking_after_callback_after_t=False)
         # test classificaiton accuracy
-    acc = test_multihead(gen_pc, val_loader, config, use_cuda, pc_trainer)
-    print("Classificaiton accuracy: ", acc)
-    acc = test(gen_pc, val_loader, config, use_cuda)
-    print("Classificaiton accuracy: ", acc)
+    # acc = test_multihead(gen_pc, val_loader, config, use_cuda, pc_trainer)
+    # print("Classificaiton accuracy: ", acc)
+    # acc = test(gen_pc, val_loader, config, use_cuda)
+    # print("Classificaiton accuracy: ", acc)
+    acc = test(gen_pc, val_loader, config, use_cuda, bias=0.)
+    print("Classificaiton accuracy, 00: ", acc)
+
+torch.save(gen_pc.state_dict(), +config["model_name"])
