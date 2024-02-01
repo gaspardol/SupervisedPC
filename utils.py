@@ -13,6 +13,11 @@ import tempfile, shutil
 from torchvision.utils import save_image
 import os
 
+
+def energy_sparse(inputs):
+    sparse_reg = 0.001
+    return (inputs['mu'] - inputs['x'])**2 + sparse_reg * inputs['x']**2
+
 def sample_x_fn(inputs):
     return inputs['mu'].detach().clone().uniform_(-10.,10.)
 
@@ -114,22 +119,28 @@ def get_mnist_data(config, binary=True):
     return train_loader, val_loader, test_loader
 
 
-def get_model(config, use_cuda, sample_x_fn = sample_x_fn):
+def get_model(config, use_cuda, sample_x_fn = sample_x_fn, energy_fn=None):
     # create model
     if config['activation_fn'] == 'relu':
         activation_fn = nn.ReLU
     elif config['activation_fn'] == 'tanh':
         activation_fn = nn.Tanh
 
+    pc_layer_kwargs = {
+        "sample_x_fn":sample_x_fn,
+    }
+    if energy_fn != None:
+        pc_layer_kwargs["energy_fn"] = energy_fn
+
     gen_pc = nn.Sequential(
         nn.Linear(config["input_size"],config["input_size"]),
-        pc.PCLayer(sample_x_fn=sample_x_fn),
+        pc.PCLayer(**pc_layer_kwargs),
         activation_fn(),
         nn.Linear(config["input_size"], config["hidden_size"]),
-        pc.PCLayer(sample_x_fn=sample_x_fn),
+        pc.PCLayer(**pc_layer_kwargs),
         activation_fn(),
         nn.Linear(config["hidden_size"], config["hidden2_size"]),
-        pc.PCLayer(sample_x_fn=sample_x_fn),
+        pc.PCLayer(**pc_layer_kwargs),
         activation_fn(),
         nn.Linear(config["hidden2_size"], config["output_size"]),
     )
@@ -302,4 +313,48 @@ class Bias_supervised(nn.Module):
 
     def forward(self, x):
         return self.bias + x
+
+def test_multihead(model, testloader, config, use_cuda, pc_trainer):
+    """
+                    - This function is under development -
+        This function finds the one-hot output with the lowest energy of each test data and compares it to the true label
+        This should behave like a one-hot prior 
+    """
+
+    test_config = deepcopy(config)
+    test_config["T_pc"] = 2000
+    test_config["optimizer_x_kwargs_pc"]={"lr": 0.05}
+
+    # make pc_trainer for test_model
+    pc_trainer = get_pc_trainer(model, test_config, is_mcpc=True, training=False)
+
+
+    correct_count, all_count = 0., 0.
+    # set model pc layer to keep track of element wise energy
+    layers = pc_trainer.get_model_pc_layers()
+    for l in layers:
+        l.is_keep_energy_per_datapoint = True
+
+    for data, labels in tqdm(testloader):
+        batch_size = data.shape[0]
+        
+        linspace = torch.linspace(0,9,10).reshape(1,-1)
+    
+        pseudo = linspace.repeat(batch_size,1).T.reshape(-1).to(torch.int64)
+        pseudo = torch.nn.functional.one_hot(pseudo, 10).to(data.dtype)
+        
+        data = data.repeat(10,1)
+        if use_cuda:
+            data, pseudo = data.cuda(), pseudo.cuda()
+        # MAP inference
+        results = pc_trainer.train_on_batch(inputs=pseudo, loss_fn=config["loss_fn"],loss_fn_kwargs={'_target':data,'_var':config["input_var"]},is_log_progress=False,is_return_results_every_t=False,is_checking_after_callback_after_t=False, is_return_batchelement_loss=True)
+        pred = results["overall_elementwise"].reshape(10,batch_size).min(0)
+        correct = (pred.indices.cpu() == labels).long()
+        correct_count += correct.sum()
+        all_count += correct.size(0)
+
+    # reset each layer to not take element wise energies
+    for l in layers:
+        l.is_keep_energy_per_datapoint = True
+    return (correct_count / all_count).cpu().item()
 

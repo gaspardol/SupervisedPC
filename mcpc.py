@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
-from utils import Bias, Bias_supervised, bernoulli_fn, sample_x_fn_normal, setup_fig, get_mnist_data, get_model, get_pc_trainer, get_mcpc_trainer, random_step
+from utils import Bias, Bias_supervised, bernoulli_fn, energy_sparse, sample_x_fn_normal, setup_fig, get_mnist_data, get_model, get_pc_trainer, get_mcpc_trainer, random_step
 from copy import deepcopy
 import predictive_coding as pc
 
@@ -42,50 +42,6 @@ def test(model, testloader, config, use_cuda, bias = 0.1):
     return correct_count / all_count
 
 
-def test_multihead(model, testloader, config, use_cuda, pc_trainer):
-    """
-                    - This function is under development -
-        This function finds the one-hot output with the lowest energy of each test data and compares it to the true label
-        This should behave like a one-hot prior 
-    """
-
-    test_config = deepcopy(config)
-    test_config["T_pc"] = 2000
-    test_config["optimizer_x_kwargs_pc"]={"lr": 0.05}
-
-    # make pc_trainer for test_model
-    pc_trainer = get_pc_trainer(model, test_config, is_mcpc=True, training=False)
-
-
-    correct_count, all_count = 0., 0.
-    # set model pc layer to keep track of element wise energy
-    layers = pc_trainer.get_model_pc_layers()
-    for l in layers:
-        l.is_keep_energy_per_datapoint = True
-
-    for data, labels in tqdm(testloader):
-        batch_size = data.shape[0]
-        
-        linspace = torch.linspace(0,9,10).reshape(1,-1)
-    
-        pseudo = linspace.repeat(batch_size,1).T.reshape(-1).to(torch.int64)
-        pseudo = torch.nn.functional.one_hot(pseudo, 10).to(data.dtype)
-        
-        data = data.repeat(10,1)
-        if use_cuda:
-            data, pseudo = data.cuda(), pseudo.cuda()
-        # MAP inference
-        results = pc_trainer.train_on_batch(inputs=pseudo, loss_fn=config["loss_fn"],loss_fn_kwargs={'_target':data,'_var':config["input_var"]},is_log_progress=False,is_return_results_every_t=False,is_checking_after_callback_after_t=False, is_return_batchelement_loss=True)
-        pred = results["overall_elementwise"].reshape(10,batch_size).min(0)
-        correct = (pred.indices.cpu() == labels).long()
-        correct_count += correct.sum()
-        all_count += correct.size(0)
-
-    # reset each layer to not take element wise energies
-    for l in layers:
-        l.is_keep_energy_per_datapoint = True
-    return (correct_count / all_count).cpu().item()
-
 
 use_cuda = torch.cuda.is_available()
 if use_cuda:
@@ -123,11 +79,11 @@ train_loader, val_loader, test_loader = get_mnist_data(config)
 
 # get model
 # create model
-gen_pc = get_model(config, use_cuda, sample_x_fn=sample_x_fn_normal)
+gen_pc = get_model(config, use_cuda, sample_x_fn=sample_x_fn_normal, energy_fn=energy_sparse)
 
-model_path = "mcpc_supervised_55"
-gen_pc.load_state_dict(torch.load(model_path, map_location='cuda:0'),strict=False)
-gen_pc.train()
+model_path = "models/mcpc_supervised_55"
+# gen_pc.load_state_dict(torch.load(model_path, map_location='cuda:0'),strict=False)
+# gen_pc.train()
 
 # create trainer for warm-up MAP inference
 pc_trainer = get_pc_trainer(gen_pc, config, is_mcpc=True)
